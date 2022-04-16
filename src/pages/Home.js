@@ -5,14 +5,18 @@ import { ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 import User from '../components/User';
 import MessageForm from '../components/MessageForm';
 import Message from '../components/Message';
+import Menu from '../components/svg/Menu';
 
 const Home = () => {
+
+  
 
   const [users, setUsers] = useState([]);
   const [chat, setChat] = useState("");
   const [text, setText] = useState('');
   const [img, setImg] = useState('');
   const [msgs, setMsgs] = useState([]);
+  const [open, setOpen] = useState(true);
 
   const user1 = auth.currentUser.uid
 
@@ -47,8 +51,6 @@ const Home = () => {
     })
   };
 
-  console.log(msgs)
-
   const handleSubmit = async e => {
     e.preventDefault()
     const user2 = chat.uid
@@ -72,19 +74,29 @@ const Home = () => {
     setText('');
   }
 
+
   return (
     <div className='home_container'>
-        <div className='users_container'>
+      {open ?
+      <div onClick={() => {setOpen(!open)}} className='menu' style={{cursor: 'pointer', zIndex: 1}}>
+        <Menu />
+      </div> : <div onClick={() => {setOpen(!open)}} className='menu' style={{cursor: 'pointer', zIndex: 1, left: '10px'}}>
+        <Menu />
+      </div>
+      }
+      { open ? 
+        <div className='users_container' style={{position: 'absolute', left: '10px'}}>
           {users.map(user => <User key={user.uid} user={user} selectUser={selectUser} />)}
-        </div>
+        </div> : <div className='users_container' style={{ position: 'relative',left: '-125px', width: "1px"}}></div> }
         <div className='messages_container'>
           {chat ? (
             <>
             <div className='messages_user'>
+              
             <h3>{chat.name}</h3>
             </div>
             <div className='messages'>
-              {msgs.length ? msgs.map((msg, i) => <Message key={i} msg={msg} />) : null}
+              {msgs.length ? msgs.map((msg, i) => <Message key={i} msg={msg} user1={user1}/>) : null}
             </div>
             <MessageForm handleSubmit={handleSubmit} text={text} setText={setText} setImg={setImg} />
             </>) : (<h3 className='no_conv'>Selecione um usuário para iniciar uma conversa</h3>)}
